@@ -37,7 +37,7 @@ fn main() {
     let mut client = match Client::new(&token, Handler) {
         Ok(client) => client,
         Err(e) => {
-            error!("Unable to connect: {}", e);
+            error!("Problem logging in: {}", e);
             process::exit(1);
         }
     };
