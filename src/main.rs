@@ -1,9 +1,11 @@
 use log::{error, info};
+use serenity::client::bridge::gateway::ShardManager;
 use serenity::framework::StandardFramework;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 use std::collections::HashSet;
 use std::process;
+use std::sync::Arc;
 
 struct Handler;
 
@@ -15,6 +17,12 @@ impl EventHandler for Handler {
     fn resume(&self, _: Context, _: ResumedEvent) {
         info!("Resumed");
     }
+}
+
+struct ShardManagerContainer;
+
+impl TypeMapKey for ShardManagerContainer {
+    type Value = Arc<Mutex<ShardManager>>;
 }
 
 fn main() {
@@ -43,6 +51,12 @@ fn main() {
             process::exit(1);
         }
     };
+
+    // Allow data to be shared across shards.
+    {
+        let mut data = client.data.write();
+        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
+    }
 
     // Get owner.
     let owners = match client.cache_and_http.http.get_current_application_info() {
