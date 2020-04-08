@@ -66,7 +66,7 @@ fn main() {
             set
         }
         Err(e) => {
-            error!("Problem getting application info: {}", e);
+            error!("Problem accessing application info: {}", e);
             process::exit(1);
         }
     };
