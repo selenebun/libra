@@ -1,5 +1,6 @@
-![](https://img.shields.io/github/workflow/status/rsaihe/libra/Rust?style=flat-square)
-![](https://img.shields.io/crates/v/libra-bot.svg?style=flat-square)
+[![](https://img.shields.io/github/workflow/status/rsaihe/libra/Rust?style=flat-square)](https://github.com/rsaihe/libra/actions?query=workflow%3ARust)
+[![](https://img.shields.io/crates/v/libra-bot.svg?style=flat-square)](https://crates.io/crates/libra-bot)
+[![](https://img.shields.io/github/license/rsaihe/libra?style=flat-square)](LICENSE)
 
 # libra
 
