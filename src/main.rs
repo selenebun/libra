@@ -1,6 +1,8 @@
 use log::{error, info};
+use serenity::framework::StandardFramework;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
+use std::collections::HashSet;
 use std::process;
 
 struct Handler;
@@ -41,6 +43,30 @@ fn main() {
             process::exit(1);
         }
     };
+
+    // Get owner.
+    let owners = match client.cache_and_http.http.get_current_application_info() {
+        Ok(info) => {
+            let mut set = HashSet::new();
+            set.insert(info.owner.id);
+            set
+        }
+        Err(e) => {
+            error!("Problem getting application info: {}", e);
+            process::exit(1);
+        }
+    };
+
+    // Configure command framework.
+    client.with_framework(StandardFramework::new().configure(|c| {
+        c.owners(owners).prefix(&match kankyo::key("PREFIX") {
+            Some(prefix) => prefix,
+            None => {
+                error!("Expected a bot prefix in the environment");
+                process::exit(1);
+            }
+        })
+    }));
 
     if let Err(e) = client.start() {
         error!("Client error: {}", e);
