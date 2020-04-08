@@ -1,4 +1,4 @@
-use log::{error, info};
+use log::{debug, error, info};
 use serenity::client::bridge::gateway::ShardManager;
 use serenity::framework::StandardFramework;
 use serenity::model::prelude::*;
@@ -6,6 +6,10 @@ use serenity::prelude::*;
 use std::collections::HashSet;
 use std::process;
 use std::sync::Arc;
+
+mod commands;
+
+use commands::OWNER_GROUP;
 
 struct Handler;
 
@@ -72,15 +76,24 @@ fn main() {
     };
 
     // Configure command framework.
-    client.with_framework(StandardFramework::new().configure(|c| {
-        c.owners(owners).prefix(&match kankyo::key("PREFIX") {
-            Some(prefix) => prefix,
-            None => {
-                error!("Expected a bot prefix in the environment");
-                process::exit(1);
-            }
-        })
-    }));
+    client.with_framework(
+        StandardFramework::new()
+            .configure(|c| {
+                c.owners(owners).prefix(&match kankyo::key("PREFIX") {
+                    Some(prefix) => prefix,
+                    None => {
+                        error!("Expected a bot prefix in the environment");
+                        process::exit(1);
+                    }
+                })
+            })
+            .group(&OWNER_GROUP)
+            .after(|_, _, command, result| {
+                if let Err(e) = result {
+                    debug!("Problem in {} command: {:?}", command, e);
+                }
+            }),
+    );
 
     if let Err(e) = client.start() {
         error!("Client error: {}", e);
