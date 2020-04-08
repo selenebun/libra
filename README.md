@@ -1,3 +1,6 @@
+![](https://img.shields.io/github/workflow/status/rsaihe/libra/Rust?style=flat-square)
+![](https://img.shields.io/crates/v/libra-bot.svg?style=flat-square)
+
 # libra
 
 A Discord bot made with the [Serenity](https://github.com/serenity-rs/serenity)
