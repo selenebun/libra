@@ -8,8 +8,9 @@ use std::process;
 use std::sync::Arc;
 
 mod commands;
+mod utils;
 
-use commands::{HELP, GENERAL_GROUP, OWNER_GROUP};
+use commands::{GENERAL_GROUP, HELP, OWNER_GROUP};
 
 struct Handler;
 
