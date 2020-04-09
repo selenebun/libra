@@ -1,4 +1,4 @@
-use serenity::framework::standard::macros::help;
+use serenity::framework::standard::macros::{command, group, help};
 use serenity::framework::standard::{
     help_commands, Args, CommandGroup, CommandResult, HelpOptions,
 };
@@ -24,4 +24,15 @@ pub fn help(
     owners: HashSet<UserId>,
 ) -> CommandResult {
     help_commands::with_embeds(ctx, msg, args, help_options, groups, owners)
+}
+
+#[group]
+#[commands(ping)]
+pub struct Meta;
+
+#[command]
+#[description("Ping the bot.")]
+fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    msg.channel_id.say(&ctx.http, "Pong!")?;
+    Ok(())
 }
