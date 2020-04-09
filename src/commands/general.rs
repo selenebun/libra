@@ -7,8 +7,10 @@ use serenity::prelude::*;
 use std::collections::HashSet;
 
 #[help]
+#[dm_and_guild_text("In DMs and servers")]
 #[embed_error_colour(RED)]
 #[embed_success_colour(FOOYOO)]
+#[guild_only_text("Only in servers")]
 #[lacking_ownership(hide)]
 #[lacking_permissions(hide)]
 #[lacking_role(hide)]
