@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 mod commands;
 
-use commands::OWNER_GROUP;
+use commands::{HELP, OWNER_GROUP};
 
 struct Handler;
 
@@ -88,6 +88,7 @@ fn main() {
                 })
             })
             .group(&OWNER_GROUP)
+            .help(&HELP)
             .after(|_, _, command, result| {
                 if let Err(e) = result {
                     debug!("Problem in {} command: {:?}", command, e);
