@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 mod commands;
 
-use commands::{HELP, META_GROUP, OWNER_GROUP};
+use commands::{HELP, GENERAL_GROUP, OWNER_GROUP};
 
 struct Handler;
 
@@ -87,7 +87,7 @@ fn main() {
                     }
                 })
             })
-            .group(&META_GROUP)
+            .group(&GENERAL_GROUP)
             .group(&OWNER_GROUP)
             .help(&HELP)
             .after(|_, _, command, result| {

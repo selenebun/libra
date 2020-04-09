@@ -28,7 +28,7 @@ pub fn help(
 
 #[group]
 #[commands(ping)]
-pub struct Meta;
+pub struct General;
 
 #[command]
 #[description("Ping the bot.")]
