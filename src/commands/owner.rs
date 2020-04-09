@@ -34,6 +34,8 @@ fn nickname(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[description("Shut down the bot.")]
 fn quit(ctx: &mut Context, msg: &Message) -> CommandResult {
+    ctx.invisible();
+
     let data = ctx.data.read();
     match data.get::<ShardManagerContainer>() {
         Some(manager) => {
