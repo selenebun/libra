@@ -1,4 +1,4 @@
-use crate::{utils, PermissionsContainer};
+use crate::{utils, PermissionsContainer, StartTime};
 use serenity::framework::standard::macros::{command, group, help};
 use serenity::framework::standard::{
     help_commands, Args, CommandGroup, CommandResult, HelpOptions,
@@ -31,8 +31,49 @@ pub fn help(
 }
 
 #[group]
-#[commands(avatar, invite, ping, wikipedia, wiktionary)]
+#[commands(about, avatar, invite, ping, wikipedia, wiktionary)]
 pub struct General;
+
+#[command]
+#[description("Get information about the bot.")]
+fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let cache = ctx.cache.read();
+    let data = ctx.data.read();
+
+    let uptime = data
+        .get::<StartTime>()
+        .map(|t| t.elapsed().as_secs().to_string())
+        .unwrap_or("N/A".to_string());
+
+    let invite_link = invite_url(ctx)
+        .map(|url| format!("\n[Invite me!]({})", url))
+        .unwrap_or_else(|_| "".to_string());
+
+    msg.channel_id.send_message(&ctx.http, |m| {
+        m.embed(|e| {
+            e.color(Color::FOOYOO)
+                .title(&cache.user.name)
+                .thumbnail(cache.user.face())
+                .description("I am a general purpose Discord bot, made with :heart: and Rust.")
+                .field(
+                    "Info",
+                    format!(
+                        "I am currently on {} servers, serving {} users in total.\nI have been online for {} seconds.",
+                        cache.guilds.len(),
+                        cache.users.len(),
+                        uptime
+                    ),
+                    false,
+                )
+                .field("Links",
+                    format!("[GitHub](https://github.com/rsaihe/libra){}", invite_link),
+                    false,
+                )
+        })
+    })?;
+
+    Ok(())
+}
 
 #[command]
 #[description("Get a user's avatar. Gets your own avatar if no user is provided.")]

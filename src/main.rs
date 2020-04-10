@@ -6,6 +6,7 @@ use serenity::prelude::*;
 use std::collections::HashSet;
 use std::process;
 use std::sync::Arc;
+use std::time::Instant;
 
 mod commands;
 mod utils;
@@ -34,6 +35,12 @@ struct ShardManagerContainer;
 
 impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
+}
+
+struct StartTime;
+
+impl TypeMapKey for StartTime {
+    type Value = Instant;
 }
 
 fn main() {
@@ -73,6 +80,7 @@ fn main() {
             },
         );
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
+        data.insert::<StartTime>(Instant::now());
     }
 
     // Get owner.
