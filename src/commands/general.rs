@@ -31,7 +31,7 @@ pub fn help(
 }
 
 #[group]
-#[commands(avatar, ping)]
+#[commands(avatar, ping, wikipedia, wiktionary)]
 pub struct General;
 
 #[command]
@@ -79,4 +79,42 @@ fn avatar(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, "Pong!")?;
     Ok(())
+}
+
+#[command]
+#[aliases(w, wiki)]
+#[description("Search a term on Wikipedia.")]
+fn wikipedia(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+    msg.channel_id.say(
+        &ctx.http,
+        format!(
+            "<https://en.wikipedia.org/wiki/{}>",
+            default_query(args.remains(), "Main_Page")
+        ),
+    )?;
+
+    Ok(())
+}
+
+#[command]
+#[aliases(wt)]
+#[description("Search a term on Wiktionary.")]
+fn wiktionary(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+    msg.channel_id.say(
+        &ctx.http,
+        format!(
+            "<https://en.wiktionary.org/wiki/{}>",
+            default_query(args.remains(), "Wiktionary:Main_Page")
+        ),
+    )?;
+
+    Ok(())
+}
+
+/// Return an optional query with the spaces converted to underscores, or
+/// otherwise use a default.
+fn default_query(query: Option<&str>, default: &str) -> String {
+    query
+        .map(|q| q.replace(' ', "_"))
+        .unwrap_or_else(|| default.to_string())
 }
