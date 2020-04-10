@@ -17,3 +17,8 @@ env_logger = "0.7"
 kankyo = "0.3"
 log = "0.4"
 serenity = "0.8"
+unicode-segmentation = "1.6"
+
+[dependencies.rand]
+version = "0.7"
+features = ["small_rng"]
