@@ -1,4 +1,4 @@
-use crate::utils;
+use crate::{utils, PermissionsContainer};
 use serenity::framework::standard::macros::{command, group, help};
 use serenity::framework::standard::{
     help_commands, Args, CommandGroup, CommandResult, HelpOptions,
@@ -31,7 +31,7 @@ pub fn help(
 }
 
 #[group]
-#[commands(avatar, ping, wikipedia, wiktionary)]
+#[commands(avatar, invite, ping, wikipedia, wiktionary)]
 pub struct General;
 
 #[command]
@@ -71,6 +71,14 @@ fn avatar(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
         })
     })?;
 
+    Ok(())
+}
+
+#[command]
+#[description("Get the invite link for the bot.")]
+fn invite(ctx: &mut Context, msg: &Message) -> CommandResult {
+    msg.channel_id
+        .say(&ctx.http, format!("<{}>", invite_url(ctx)?))?;
     Ok(())
 }
 
@@ -117,4 +125,16 @@ fn default_query(query: Option<&str>, default: &str) -> String {
     query
         .map(|q| q.replace(' ', "_"))
         .unwrap_or_else(|| default.to_string())
+}
+
+/// Return the bot's invite URL with the appropriate permissions.
+fn invite_url(ctx: &Context) -> serenity::Result<String> {
+    let data = ctx.data.read();
+
+    let perms = data
+        .get::<PermissionsContainer>()
+        .copied()
+        .unwrap_or_else(|| Permissions::empty());
+
+    ctx.cache.read().user.invite_url(&ctx.http, perms)
 }

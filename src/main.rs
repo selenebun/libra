@@ -24,6 +24,12 @@ impl EventHandler for Handler {
     }
 }
 
+struct PermissionsContainer;
+
+impl TypeMapKey for PermissionsContainer {
+    type Value = Permissions;
+}
+
 struct ShardManagerContainer;
 
 impl TypeMapKey for ShardManagerContainer {
@@ -60,6 +66,12 @@ fn main() {
     // Allow data to be shared across shards.
     {
         let mut data = client.data.write();
+        data.insert::<PermissionsContainer>(
+            match kankyo::key("PERMS").and_then(|p| p.parse().ok()) {
+                Some(p) => Permissions::from_bits_truncate(p),
+                None => Permissions::empty(),
+            },
+        );
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
 
