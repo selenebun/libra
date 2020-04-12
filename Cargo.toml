@@ -1,6 +1,6 @@
 [package]
 name = "libra-bot"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["rsaihe"]
 edition = "2018"
 description = "A Discord bot for personal use."
