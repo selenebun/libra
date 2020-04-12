@@ -43,7 +43,7 @@ fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
     // Get the number of users in all guilds.
     let users = cache.guilds.values().fold(0, |acc, guild| {
         let guild = guild.read();
-        acc + guild.members.len()
+        acc + guild.member_count
     });
 
     let uptime = data
