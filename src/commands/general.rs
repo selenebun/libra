@@ -40,6 +40,12 @@ fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
     let cache = ctx.cache.read();
     let data = ctx.data.read();
 
+    // Get the number of users in all guilds.
+    let users = cache.guilds.values().fold(0, |acc, guild| {
+        let guild = guild.read();
+        acc + guild.members.len()
+    });
+
     let uptime = data
         .get::<StartTime>()
         .map(|t| t.elapsed().as_secs().to_string())
@@ -60,7 +66,7 @@ fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
                     format!(
                         "I am currently on {} servers, serving {} users in total.\nI have been online for {} seconds.",
                         cache.guilds.len(),
-                        cache.users.len(),
+                        users,
                         uptime
                     ),
                     false,
