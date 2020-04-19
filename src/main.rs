@@ -11,7 +11,7 @@ use std::time::Instant;
 mod commands;
 mod utils;
 
-use commands::{FUN_GROUP, GENERAL_GROUP, HELP, OWNER_GROUP};
+use commands::{FUN_GROUP, GENERAL_GROUP, HELP, MATH_GROUP, OWNER_GROUP};
 
 struct Handler;
 
@@ -108,8 +108,9 @@ fn main() {
                     }
                 })
             })
-            .group(&FUN_GROUP)
             .group(&GENERAL_GROUP)
+            .group(&FUN_GROUP)
+            .group(&MATH_GROUP)
             .group(&OWNER_GROUP)
             .help(&HELP)
             .after(|_, _, command, result| {
