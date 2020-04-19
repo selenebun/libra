@@ -30,7 +30,7 @@ fn clap(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 #[command("8ball")]
 #[description("Ask the Magic 8-Ball a question.")]
 #[min_args(1)]
-#[usage("question")]
+#[usage("word...")]
 fn eight_ball(ctx: &mut Context, msg: &Message) -> CommandResult {
     const ANSWERS: [&str; 20] = [
         "It is certain.",
