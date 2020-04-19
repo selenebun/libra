@@ -8,8 +8,24 @@ use serenity::prelude::*;
 use unicode_segmentation::UnicodeSegmentation;
 
 #[group]
-#[commands(eight_ball, shuffle)]
+#[commands(eight_ball, clap, shuffle)]
 pub struct Fun;
+
+#[command]
+#[description(":clap: Spice :clap: up :clap: your :clap: text! :clap:")]
+#[min_args(1)]
+#[usage("word...")]
+fn clap(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+    let mut result = String::from(":clap: ");
+    for word in args.iter::<String>().flat_map(|w| w) {
+        result.push_str(&word);
+        result.push_str(" :clap: ");
+    }
+
+    msg.channel_id.say(&ctx.http, result)?;
+
+    Ok(())
+}
 
 #[command("8ball")]
 #[description("Ask the Magic 8-Ball a question.")]
