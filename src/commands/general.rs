@@ -83,6 +83,7 @@ fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 #[description("Get a user's avatar. Gets your own avatar if no user is provided.")]
+#[usage("[user]")]
 fn avatar(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let user = if args.is_empty() {
         Some(msg.author.clone())
@@ -139,6 +140,7 @@ fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
 #[command]
 #[aliases(w, wiki)]
 #[description("Search a term on Wikipedia.")]
+#[usage("<term>")]
 fn wikipedia(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     msg.channel_id.say(
         &ctx.http,
@@ -154,6 +156,7 @@ fn wikipedia(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 #[aliases(wt)]
 #[description("Search a term on Wiktionary.")]
+#[usage("<term>")]
 fn wiktionary(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     msg.channel_id.say(
         &ctx.http,

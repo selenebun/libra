@@ -10,7 +10,7 @@ pub struct Math;
 #[command]
 #[description("Calculates the number of steps in the [Collatz sequence](https://en.wikipedia.org/wiki/Collatz_conjecture) for a given positive integer.")]
 #[num_args(1)]
-#[usage("num")]
+#[usage("<number>")]
 fn collatz(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let mut num = match args.parse::<u128>() {
         Ok(num) => num,

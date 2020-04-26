@@ -14,7 +14,7 @@ pub struct Fun;
 #[command]
 #[description(":clap: Spice :clap: up :clap: your :clap: text! :clap:")]
 #[min_args(1)]
-#[usage("word...")]
+#[usage("<word>...")]
 fn clap(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut result = String::from(":clap: ");
     for word in args.iter::<String>().flat_map(|w| w) {
@@ -30,7 +30,7 @@ fn clap(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 #[command("8ball")]
 #[description("Ask the Magic 8-Ball a question.")]
 #[min_args(1)]
-#[usage("word...")]
+#[usage("<word>...")]
 fn eight_ball(ctx: &mut Context, msg: &Message) -> CommandResult {
     const ANSWERS: [&str; 20] = [
         "It is certain.",
@@ -65,7 +65,7 @@ fn eight_ball(ctx: &mut Context, msg: &Message) -> CommandResult {
 #[aliases(scramble)]
 #[description("Randomly scramble words.")]
 #[min_args(1)]
-#[usage("word...")]
+#[usage("<word>...")]
 fn shuffle(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     // Break up each Unicode word into individual graphemes and shuffle.
     let words: String = args
