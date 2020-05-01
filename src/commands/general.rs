@@ -87,11 +87,14 @@ fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
 fn avatar(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let user = if args.is_empty() {
         Some(msg.author.clone())
-    } else {
+    } else if msg.mentions.is_empty() {
         // If arguments are provided, try to find a matching user.
         msg.guild_id
             .and_then(|id| utils::find_user_in_guild(&ctx.cache.read(), id, args.message()))
             .and_then(|id| id.to_user(&ctx.http).ok())
+    } else {
+        // Get first mentioned user.
+        msg.mentions.first().cloned()
     };
 
     let user = match &user {
