@@ -4,10 +4,11 @@ use serenity::framework::standard::macros::{command, group};
 use serenity::framework::standard::{Args, CommandResult};
 use serenity::model::prelude::*;
 use serenity::prelude::*;
+use serenity::utils::{Color, MessageBuilder};
 use std::process;
 
 #[group]
-#[commands(nickname, quit)]
+#[commands(nickname, quit, servers)]
 #[owners_only]
 pub struct Owner;
 
@@ -47,6 +48,35 @@ fn quit(ctx: &mut Context, msg: &Message) -> CommandResult {
             process::exit(1);
         }
     }
+
+    Ok(())
+}
+
+#[command]
+#[aliases(guilds)]
+#[description("List all the servers the bot is currently in.")]
+fn servers(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let cache = ctx.cache.read();
+
+    // Get a vector of server names.
+    let mut names: Vec<_> = cache
+        .guilds
+        .values()
+        .map(|guild| guild.read().name.clone())
+        .collect();
+    names.sort_unstable();
+
+    msg.channel_id.send_message(&ctx.http, |m| {
+        m.embed(|e| {
+            e.color(Color::FOOYOO).title("Servers").description({
+                let mut content = MessageBuilder::new();
+                for name in &names {
+                    content.push_line(name);
+                }
+                content.build()
+            })
+        })
+    })?;
 
     Ok(())
 }
