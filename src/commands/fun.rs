@@ -71,10 +71,10 @@ fn shuffle(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let words: String = args
         .message()
         .split_word_bounds()
-        .collect::<Vec<&str>>()
+        .collect::<Vec<_>>()
         .iter()
         .map(|word| {
-            let mut graphemes = word.graphemes(true).collect::<Vec<&str>>();
+            let mut graphemes: Vec<_> = word.graphemes(true).collect();
             graphemes.shuffle(&mut SmallRng::from_entropy());
             graphemes.concat()
         })
