@@ -3,7 +3,7 @@ use serenity::client::bridge::gateway::ShardManager;
 use serenity::framework::StandardFramework;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::process;
 use std::sync::Arc;
 use std::time::Instant;
@@ -25,10 +25,22 @@ impl EventHandler for Handler {
     }
 }
 
+struct DefaultPrefix;
+
+impl TypeMapKey for DefaultPrefix {
+    type Value = String;
+}
+
 struct PermissionsContainer;
 
 impl TypeMapKey for PermissionsContainer {
     type Value = Permissions;
+}
+
+struct Prefixes;
+
+impl TypeMapKey for Prefixes {
+    type Value = Arc<RwLock<HashMap<GuildId, String>>>;
 }
 
 struct ShardManagerContainer;
@@ -73,12 +85,20 @@ fn main() {
     // Allow data to be shared across shards.
     {
         let mut data = client.data.write();
+        data.insert::<DefaultPrefix>(match kankyo::key("PREFIX") {
+            Some(prefix) => prefix,
+            None => {
+                error!("Expected a default bot prefix in the environment");
+                process::exit(1);
+            }
+        });
         data.insert::<PermissionsContainer>(
             match kankyo::key("PERMS").and_then(|p| p.parse().ok()) {
                 Some(p) => Permissions::from_bits_truncate(p),
                 None => Permissions::empty(),
             },
         );
+        data.insert::<Prefixes>(Arc::new(RwLock::new(HashMap::new())));
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
         data.insert::<StartTime>(Instant::now());
     }
@@ -100,11 +120,22 @@ fn main() {
     client.with_framework(
         StandardFramework::new()
             .configure(|c| {
-                c.owners(owners).prefix(&match kankyo::key("PREFIX") {
-                    Some(prefix) => prefix,
-                    None => {
-                        error!("Expected a bot prefix in the environment");
-                        process::exit(1);
+                c.owners(owners).dynamic_prefix(|ctx, msg| {
+                    let data = ctx.data.read();
+                    match data.get::<Prefixes>() {
+                        Some(prefixes) => msg
+                            .guild_id
+                            .and_then(|id| prefixes.read().get(&id).cloned())
+                            .or_else(|| {
+                                data.get::<DefaultPrefix>().cloned().or_else(|| {
+                                    error!("Problem accessing default prefix");
+                                    process::exit(1);
+                                })
+                            }),
+                        None => {
+                            error!("Problem accessing server prefixes");
+                            process::exit(1);
+                        }
                     }
                 })
             })

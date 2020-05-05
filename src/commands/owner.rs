@@ -1,4 +1,4 @@
-use crate::ShardManagerContainer;
+use crate::{DefaultPrefix, Prefixes, ShardManagerContainer};
 use log::error;
 use serenity::framework::standard::macros::{command, group};
 use serenity::framework::standard::{Args, CommandResult};
@@ -8,7 +8,7 @@ use serenity::utils::{Color, MessageBuilder};
 use std::process;
 
 #[group]
-#[commands(nickname, quit, servers)]
+#[commands(nickname, prefix, quit, servers)]
 #[owners_only]
 pub struct Owner;
 
@@ -33,6 +33,45 @@ fn nickname(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 }
 
 #[command]
+#[description(
+    "Change the bot's prefix on the current server. Resets if no arguments are provided."
+)]
+#[only_in(guilds)]
+#[usage("[prefix]")]
+fn prefix(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+    let data = ctx.data.read();
+    match data.get::<Prefixes>() {
+        Some(prefixes) => {
+            let mut prefixes = prefixes.write();
+            if args.is_empty() {
+                msg.channel_id.say(
+                    &ctx.http,
+                    format!(
+                        "Reset prefix to `{}`.",
+                        data.get::<DefaultPrefix>().unwrap_or_else(|| {
+                            error!("Expected a default bot prefix in the environment");
+                            process::exit(1);
+                        })
+                    ),
+                )?;
+                prefixes.remove(&msg.guild_id.unwrap());
+            } else {
+                msg.channel_id.say(
+                    &ctx.http,
+                    format!("Changed prefix to `{}`.", args.message()),
+                )?;
+                prefixes.insert(msg.guild_id.unwrap(), args.message().to_string());
+            }
+        }
+        None => {
+            error!("Problem accessing prefixes");
+            process::exit(1);
+        }
+    }
+    Ok(())
+}
+
+#[command]
 #[description("Shut down the bot.")]
 fn quit(ctx: &mut Context, msg: &Message) -> CommandResult {
     ctx.invisible();
@@ -44,7 +83,7 @@ fn quit(ctx: &mut Context, msg: &Message) -> CommandResult {
             manager.lock().shutdown_all();
         }
         None => {
-            error!("There was a problem accessing the shard manager");
+            error!("Problem accessing the shard manager");
             process::exit(1);
         }
     }
