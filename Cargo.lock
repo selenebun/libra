@@ -551,6 +551,8 @@ dependencies = [
  "kankyo",
  "log",
  "rand",
+ "serde",
+ "serde_json",
  "serenity",
  "unicode-segmentation",
 ]

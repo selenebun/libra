@@ -1,9 +1,11 @@
-use log::{debug, error, info};
+use log::{error, info, warn};
+use serde::de;
 use serenity::client::bridge::gateway::ShardManager;
 use serenity::framework::StandardFramework;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 use std::collections::{HashMap, HashSet};
+use std::fs;
 use std::process;
 use std::sync::Arc;
 use std::time::Instant;
@@ -98,7 +100,21 @@ fn main() {
                 None => Permissions::empty(),
             },
         );
-        data.insert::<Prefixes>(Arc::new(RwLock::new(HashMap::new())));
+        data.insert::<Prefixes>(Arc::new(RwLock::new({
+            match kankyo::key("PREFIX_FILE") {
+                Some(file) => fs::read_to_string(file)
+                    .map_err(de::Error::custom)
+                    .and_then(|contents| serde_json::from_str(&contents))
+                    .unwrap_or_else(|e| {
+                        warn!("Problem reading prefix file: {:?}", e);
+                        HashMap::new()
+                    }),
+                None => {
+                    error!("Expected a prefix file in the environment");
+                    process::exit(1);
+                }
+            }
+        })));
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
         data.insert::<StartTime>(Instant::now());
     }
@@ -146,12 +162,31 @@ fn main() {
             .help(&HELP)
             .after(|_, _, command, result| {
                 if let Err(e) = result {
-                    debug!("Problem in {} command: {:?}", command, e);
+                    warn!("Problem in {} command: {:?}", command, e);
                 }
             }),
     );
 
-    if let Err(e) = client.start() {
+    // Run the client.
+    let result = client.start();
+
+    // Write server-local prefixes to a file.
+    {
+        let data = client.data.read();
+        if let Some(prefixes) = data.get::<Prefixes>() {
+            match kankyo::key("PREFIX_FILE") {
+                Some(file) => {
+                    match fs::write(file, serde_json::to_string(&*prefixes.read()).unwrap()) {
+                        Ok(_) => info!("Prefix file successfully written"),
+                        Err(e) => error!("Problem writing prefix file: {:?}", e),
+                    }
+                }
+                None => error!("Expected a prefix file in the environment"),
+            }
+        }
+    }
+
+    if let Err(e) = result {
         error!("Client error: {}", e);
         process::exit(1);
     };
