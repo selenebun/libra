@@ -23,10 +23,10 @@ Assuming Rust is installed, you should be able to run the bot with `cargo run
 You can find your application's client ID on the [developer portal]. Once
 you have it, simply use the following link to invite the bot to a server:
 
-<https://discordapp.com/api/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permissions=67488832>
+<https://discord.com/api/oauth2/authorize?client_id=CLIENT_ID&scope=bot&permissions=67488832>
 
 Note that you will have to replace the `CLIENT_ID` in the URL with the ID you
 copied.
 
-[developer portal]: https://discordapp.com/developers/applications
+[developer portal]: https://discord.com/developers/applications
 [Serenity]: https://github.com/serenity-rs/serenity
